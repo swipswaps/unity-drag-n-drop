@@ -135,8 +135,9 @@ GameObject:
   - component: {fileID: 17868081}
   - component: {fileID: 17868080}
   - component: {fileID: 17868079}
+  - component: {fileID: 17868082}
   m_Layer: 5
-  m_Name: Viewport
+  m_Name: FavoritesViewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,6 +214,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 17868077}
   m_CullTransparentMesh: 0
+--- !u!114 &17868082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17868077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67e990f7132ff734b9d8a94d47d796c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &54676007
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,7 +573,7 @@ GameObject:
   - component: {fileID: 69753896}
   - component: {fileID: 69753895}
   m_Layer: 5
-  m_Name: ScrollViewBands
+  m_Name: ScrollViewFavorites
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1012,7 +1025,7 @@ GameObject:
   - component: {fileID: 341703893}
   - component: {fileID: 341703892}
   m_Layer: 5
-  m_Name: Content
+  m_Name: FavoritesContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1707,7 +1720,7 @@ GameObject:
   - component: {fileID: 1405968822}
   - component: {fileID: 1405968821}
   m_Layer: 5
-  m_Name: Content
+  m_Name: BandsContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1797,8 +1810,9 @@ GameObject:
   - component: {fileID: 1876877753}
   - component: {fileID: 1876877752}
   - component: {fileID: 1876877751}
+  - component: {fileID: 1876877754}
   m_Layer: 5
-  m_Name: Viewport
+  m_Name: BandsViewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1875,6 +1889,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1876877749}
   m_CullTransparentMesh: 0
+--- !u!114 &1876877754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876877749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67e990f7132ff734b9d8a94d47d796c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1960287878
 GameObject:
   m_ObjectHideFlags: 0
@@ -2052,9 +2078,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8233f85f3df11a47a288ea7c2e27165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollViewBandsContent: {fileID: 1405968820}
+  canvas: {fileID: 409859698}
+  mainPanel: {fileID: 910315780}
+  scrollViewBandsPanelContent: {fileID: 1405968820}
+  scrollViewFavoritePanelContent: {fileID: 341703891}
   itemPrefab: {fileID: 2684151585045360532, guid: c4ca49c59f27a244d9379fe285f39c53, type: 3}
-  itemPrefabs: []
+  bands: []
+  favorites: []
+  bandItemPrefabs: []
+  favoritesItemPrefabs: []
 --- !u!1 &2122358269
 GameObject:
   m_ObjectHideFlags: 0

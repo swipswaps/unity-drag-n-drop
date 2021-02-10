@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
-[SerializeField]
+[Serializable]
 public class Band
 {
     private int id;
-    private string name;
+    [SerializeField] private string name;
     private int year;
 
     public int Id { get => id; set => id = value; }

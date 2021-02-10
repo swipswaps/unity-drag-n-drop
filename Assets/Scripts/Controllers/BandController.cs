@@ -1,31 +1,40 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BandController : MonoBehaviour
 {
     // || Inspector References
 
-    [SerializeField] private RectTransform scrollViewBandsContent;
+    [SerializeField] private Canvas canvas;
+    [SerializeField] private RectTransform mainPanel;
+    [SerializeField] private RectTransform scrollViewBandsPanelContent;
+    [SerializeField] private RectTransform scrollViewFavoritePanelContent;
     [SerializeField] private ItemPrefab itemPrefab;
 
     // || State
 
     [SerializeField] private List<Band> bands;
-    [SerializeField] private List<ItemPrefab> itemPrefabs;
+    [SerializeField] private List<Band> favorites;
+    [SerializeField] private List<ItemPrefab> bandItemPrefabs;
+    [SerializeField] private List<ItemPrefab> favoritesItemPrefabs;
 
-    // || Cached References
+    // || Properties
 
     public static BandController Instance { get; private set; }
-    public List<ItemPrefab> ItemPrefabs { get => itemPrefabs; private set => itemPrefabs = value; }
+    public List<ItemPrefab> BandItemPrefabs { get => bandItemPrefabs; private set => bandItemPrefabs = value; }
+    public List<ItemPrefab> FavoriteItemPrefabs { get => favoritesItemPrefabs; private set => favoritesItemPrefabs = value; }
     public List<Band> Bands { get => bands; private set => bands = value; }
+    public List<Band> Favorites { get => favorites; private set => favorites = value; }
+    public Canvas Canvas => canvas;
+    public RectTransform MainPanel => mainPanel;
+    public RectTransform ScrollViewBandsPanelContent => scrollViewBandsPanelContent;
+    public RectTransform ScrollViewFavoritePanelContent => scrollViewFavoritePanelContent;
 
     private void Awake()
     {
         Instance = this;
 
-        bands = new List<Band>()
+        Bands = new List<Band>()
         {
             new Band(1, "Queen", 1970),
             new Band(2, "Led Zeppelin", 1968),
@@ -39,7 +48,10 @@ public class BandController : MonoBehaviour
             new Band(10, "Foo Fighters", 1994),
         };
 
-        ItemPrefabs = new List<ItemPrefab>();
+        Favorites = new List<Band>();
+
+        BandItemPrefabs = new List<ItemPrefab>();
+        FavoriteItemPrefabs = new List<ItemPrefab>();
     }
 
     private void Start()
@@ -49,23 +61,28 @@ public class BandController : MonoBehaviour
 
     public void ListItems()
     {
-        if (scrollViewBandsContent && itemPrefab)
+        ListItems(scrollViewBandsPanelContent, BandItemPrefabs, Bands, "BandItemPrefabs");
+        ListItems(scrollViewFavoritePanelContent, FavoriteItemPrefabs, Favorites, "FavoriteItemPrefabs");
+    }
+
+    private void ListItems(RectTransform content, List<ItemPrefab> listItemPrefabs, List<Band> listBands, string currentListName)
+    {
+        if (itemPrefab)
         {
-            foreach (Transform item in scrollViewBandsContent)
+            foreach (Transform item in content)
             {
                 Destroy(item.gameObject);
             }
 
-            ItemPrefabs.Clear();
+            listItemPrefabs.Clear();
 
-            for (int index = 0; index < bands.Count; index++)
+            for (int index = 0; index < listBands.Count; index++)
             {
-                ItemPrefab item = Instantiate(itemPrefab, scrollViewBandsContent.position, Quaternion.identity);
-                item.transform.SetParent(scrollViewBandsContent);
+                ItemPrefab item = Instantiate(itemPrefab, content.position, Quaternion.identity);
+                item.transform.SetParent(content);
                 item.transform.localScale = Vector3.one;
-                item.Set(index, bands[index], bands.Count);
-                ItemPrefabs.Add(item);
-                
+                item.Set(index, listBands[index], listBands.Count, currentListName);
+                listItemPrefabs.Add(item);
             }
         }
     }

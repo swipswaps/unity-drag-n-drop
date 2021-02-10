@@ -67,47 +67,59 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void MoveUp(int numberToDecrementIndex)
     {
+        bool isFavorite = currentListName.Equals("FavoriteItemPrefabs");
+        int listCount = (isFavorite ? BandController.Instance.Favorites.Count : BandController.Instance.Bands.Count);
         int previousIndex = (currentIndex - numberToDecrementIndex);
 
-        if (currentListName.Equals("BandItemPrefabs"))
+        if (previousIndex >= 0 && previousIndex <= listCount - 1)
         {
-            BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.BandItemPrefabs.Insert(previousIndex, this);
-            BandController.Instance.Bands.RemoveAt(currentIndex);
-            BandController.Instance.Bands.Insert(previousIndex, Band);
-        }
-        else if (currentListName.Equals("FavoriteItemPrefabs"))
-        {
-            BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.FavoriteItemPrefabs.Insert(previousIndex, this);
-            BandController.Instance.Favorites.RemoveAt(currentIndex);
-            BandController.Instance.Favorites.Insert(previousIndex, Band);
+            if (!isFavorite)
+            {
+                BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
+                BandController.Instance.BandItemPrefabs.Insert(previousIndex, this);
+                BandController.Instance.Bands.RemoveAt(currentIndex);
+                BandController.Instance.Bands.Insert(previousIndex, Band);
+            }
+            else
+            {
+                BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
+                BandController.Instance.FavoriteItemPrefabs.Insert(previousIndex, this);
+                BandController.Instance.Favorites.RemoveAt(currentIndex);
+                BandController.Instance.Favorites.Insert(previousIndex, Band);
+            }
+
+            currentIndex = previousIndex;
         }
 
-        currentIndex = previousIndex;
         BandController.Instance.ListItems();
     }
 
     public void MoveBottom(int numberToIncrementIndex)
     {
+        bool isFavorite = currentListName.Equals("FavoriteItemPrefabs");
+        int listCount = (isFavorite ? BandController.Instance.Favorites.Count : BandController.Instance.Bands.Count);
         int nextIndex = (currentIndex + numberToIncrementIndex);
 
-        if (currentListName.Equals("BandItemPrefabs"))
+        if (nextIndex >= 0 && nextIndex <= listCount - 1)
         {
-            BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.BandItemPrefabs.Insert(nextIndex, this);
-            BandController.Instance.Bands.RemoveAt(currentIndex);
-            BandController.Instance.Bands.Insert(nextIndex, Band);
-        }
-        else if (currentListName.Equals("FavoriteItemPrefabs"))
-        {
-            BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.FavoriteItemPrefabs.Insert(nextIndex, this);
-            BandController.Instance.Favorites.RemoveAt(currentIndex);
-            BandController.Instance.Favorites.Insert(nextIndex, Band);
-        }
+            if (!isFavorite)
+            {
+                BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
+                BandController.Instance.BandItemPrefabs.Insert(nextIndex, this);
+                BandController.Instance.Bands.RemoveAt(currentIndex);
+                BandController.Instance.Bands.Insert(nextIndex, Band);
+            }
+            else
+            {
+                BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
+                BandController.Instance.FavoriteItemPrefabs.Insert(nextIndex, this);
+                BandController.Instance.Favorites.RemoveAt(currentIndex);
+                BandController.Instance.Favorites.Insert(nextIndex, Band);
+            }
 
-        currentIndex = nextIndex;
+            currentIndex = nextIndex;
+        }
+        
         BandController.Instance.ListItems();
     }
 

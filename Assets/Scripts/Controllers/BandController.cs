@@ -25,10 +25,11 @@ public class BandController : MonoBehaviour
     public List<ItemPrefab> FavoriteItemPrefabs { get => favoritesItemPrefabs; private set => favoritesItemPrefabs = value; }
     public List<Band> Bands { get => bands; private set => bands = value; }
     public List<Band> Favorites { get => favorites; private set => favorites = value; }
-    public Canvas Canvas => canvas;
     public RectTransform MainPanel => mainPanel;
     public RectTransform ScrollViewBandsPanelContent => scrollViewBandsPanelContent;
     public RectTransform ScrollViewFavoritePanelContent => scrollViewFavoritePanelContent;
+
+    public Canvas Canvas { get => canvas; private set => canvas = value; }
 
     private void Awake()
     {

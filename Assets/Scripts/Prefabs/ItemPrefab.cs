@@ -32,16 +32,18 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public Band Band { get => band; set => band = value; }
     public string CurrentListName { get => currentListName; set => currentListName = value; }
     public Transform InitialParent { get => initialParent; set => initialParent = value; }
+    public Vector2 InitialPosition { get => initialPosition; set => initialPosition = value; }
+    public CanvasGroup CanvasGroup { get => canvasGroup; private set => canvasGroup = value; }
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
+        CanvasGroup = GetComponent<CanvasGroup>();
 
         if (moveBottomButton && moveUpButton && deleteButton)
         {
-            moveBottomButton.onClick.AddListener(MoveBottom);
-            moveUpButton.onClick.AddListener(MoveUp);
+            moveBottomButton.onClick.AddListener(() => MoveBottom(1));
+            moveUpButton.onClick.AddListener(() => MoveUp(1));
             deleteButton.onClick.AddListener(Delete);
         }
     }
@@ -63,9 +65,9 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         }
     }
 
-    private void MoveUp()
+    public void MoveUp(int numberToDecrementIndex)
     {
-        int previousIndex = (currentIndex - 1);
+        int previousIndex = (currentIndex - numberToDecrementIndex);
 
         if (currentListName.Equals("BandItemPrefabs"))
         {
@@ -86,9 +88,9 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         BandController.Instance.ListItems();
     }
 
-    private void MoveBottom()
+    public void MoveBottom(int numberToIncrementIndex)
     {
-        int nextIndex = (currentIndex + 1);
+        int nextIndex = (currentIndex + numberToIncrementIndex);
 
         if (currentListName.Equals("BandItemPrefabs"))
         {
@@ -104,7 +106,7 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             BandController.Instance.Favorites.RemoveAt(currentIndex);
             BandController.Instance.Favorites.Insert(nextIndex, Band);
         }
-        
+
         currentIndex = nextIndex;
         BandController.Instance.ListItems();
     }
@@ -121,7 +123,7 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
             BandController.Instance.Favorites.RemoveAt(currentIndex);
         }
-        
+
         Destroy(gameObject);
         BandController.Instance.ListItems();
     }
@@ -130,8 +132,9 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         if (BandController.Instance.MainPanel)
         {
-            canvasGroup.alpha = 0.5f;
-            canvasGroup.blocksRaycasts = false;
+            CanvasGroup.alpha = 0.5f;
+            CanvasGroup.blocksRaycasts = false;
+            InitialPosition = transform.position;
             InitialParent = transform.parent;
             transform.SetParent(BandController.Instance.MainPanel);
             transform.SetAsLastSibling();
@@ -140,8 +143,8 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
+        CanvasGroup.alpha = 1f;
+        CanvasGroup.blocksRaycasts = true;
 
         if (eventData.hovered.Count >= 1)
         {

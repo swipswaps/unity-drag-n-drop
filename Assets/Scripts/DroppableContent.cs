@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 // || This is attached to the Viewport of ScrollView
 public class DroppableContent : MonoBehaviour, IDropHandler
 {
+    private float gapBetweenItems = 20;
+
     // || Cached References
 
     private RectTransform content;
@@ -14,6 +16,12 @@ public class DroppableContent : MonoBehaviour, IDropHandler
         {
             content = transform.GetChild(0).GetComponent<RectTransform>();
         }
+    }
+
+    private void Start()
+    {
+        float scale = BandController.Instance.Canvas.scaleFactor;
+        gapBetweenItems *= (scale * 5);
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -44,6 +52,26 @@ public class DroppableContent : MonoBehaviour, IDropHandler
                         BandController.Instance.Favorites.RemoveAt(itemPrefab.CurrentIndex);
                         BandController.Instance.BandItemPrefabs.Add(itemPrefab);
                         BandController.Instance.Bands.Add(itemPrefab.Band);
+                    }
+                }
+                else
+                {
+                    Vector2 dropPosition = eventData.position;
+                    int differenceY = Mathf.FloorToInt((dropPosition.y - itemPrefab.InitialPosition.y));
+                    int numberToJump = Mathf.Abs(differenceY / (int) gapBetweenItems);
+
+                    if (numberToJump >= 1)
+                    {
+                        if (differenceY <= -gapBetweenItems)
+                        {
+                            itemPrefab.MoveBottom(numberToJump);
+                        }
+                        else if (differenceY >= -gapBetweenItems)
+                        {
+                            itemPrefab.MoveUp(numberToJump);
+                        }
+
+                        return;
                     }
                 }
 

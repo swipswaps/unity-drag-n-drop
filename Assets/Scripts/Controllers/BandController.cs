@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BandController : MonoBehaviour
 {
@@ -10,13 +11,14 @@ public class BandController : MonoBehaviour
     [SerializeField] private RectTransform scrollViewBandsPanelContent;
     [SerializeField] private RectTransform scrollViewFavoritePanelContent;
     [SerializeField] private ItemPrefab itemPrefab;
+    [SerializeField] private Button quitButton;
 
     // || State
 
-    [SerializeField] private List<Band> bands;
-    [SerializeField] private List<Band> favorites;
-    [SerializeField] private List<ItemPrefab> bandItemPrefabs;
-    [SerializeField] private List<ItemPrefab> favoritesItemPrefabs;
+    private List<Band> bands;
+    private List<Band> favorites;
+    private List<ItemPrefab> bandItemPrefabs;
+    private List<ItemPrefab> favoritesItemPrefabs;
 
     // || Properties
 
@@ -53,6 +55,16 @@ public class BandController : MonoBehaviour
 
         BandItemPrefabs = new List<ItemPrefab>();
         FavoriteItemPrefabs = new List<ItemPrefab>();
+
+        if (quitButton)
+        {
+            quitButton.onClick.AddListener(() => Application.Quit());
+
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                quitButton.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void Start()

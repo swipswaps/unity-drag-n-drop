@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,28 +9,20 @@ public class BandController : MonoBehaviour
 
     [SerializeField] private Canvas canvas;
     [SerializeField] private RectTransform mainPanel;
-    [SerializeField] private RectTransform scrollViewBandsPanelContent;
-    [SerializeField] private RectTransform scrollViewFavoritePanelContent;
+    [SerializeField] private List<RectTransform> panelsContent;
+    [SerializeField] private List<TextMeshProUGUI> panelsHeaders;
     [SerializeField] private ItemPrefab itemPrefab;
     [SerializeField] private Button quitButton;
 
-    // || State
-
-    private List<Band> bands;
-    private List<Band> favorites;
-    private List<ItemPrefab> bandItemPrefabs;
-    private List<ItemPrefab> favoritesItemPrefabs;
 
     // || Properties
 
     public static BandController Instance { get; private set; }
-    public List<ItemPrefab> BandItemPrefabs { get => bandItemPrefabs; private set => bandItemPrefabs = value; }
-    public List<ItemPrefab> FavoriteItemPrefabs { get => favoritesItemPrefabs; private set => favoritesItemPrefabs = value; }
-    public List<Band> Bands { get => bands; private set => bands = value; }
-    public List<Band> Favorites { get => favorites; private set => favorites = value; }
+    public List<ItemPrefab> BandItemPrefabs { get; private set; }
+    public List<ItemPrefab> FavoriteItemPrefabs { get; private set; }
+    public List<Band> Bands { get; private set; }
+    public List<Band> Favorites { get; private set; }
     public RectTransform MainPanel => mainPanel;
-    public RectTransform ScrollViewBandsPanelContent => scrollViewBandsPanelContent;
-    public RectTransform ScrollViewFavoritePanelContent => scrollViewFavoritePanelContent;
 
     public Canvas Canvas { get => canvas; private set => canvas = value; }
 
@@ -74,29 +67,61 @@ public class BandController : MonoBehaviour
 
     public void ListItems()
     {
-        ListItems(scrollViewBandsPanelContent, BandItemPrefabs, Bands, "BandItemPrefabs");
-        ListItems(scrollViewFavoritePanelContent, FavoriteItemPrefabs, Favorites, "FavoriteItemPrefabs");
+        if (panelsContent != null && panelsContent.Count == 2 &&
+            panelsHeaders != null && panelsHeaders.Count == 2)
+        {
+            PropertiesHolder[] holders =
+            {
+                new PropertiesHolder()
+                {
+                    Bands = Bands, ItemPrefabs = BandItemPrefabs, PanelContent = panelsContent[0],
+                    PanelTitle = panelsHeaders[0], Type = BandType.Current
+                },
+                new PropertiesHolder()
+                {
+                    Bands = Favorites, ItemPrefabs = FavoriteItemPrefabs, PanelContent = panelsContent[1],
+                    PanelTitle = panelsHeaders[1], Type = BandType.Favorite
+                },
+            };
+
+            foreach(PropertiesHolder holder in holders)
+            {
+                ListItems(holder);
+            }
+        }
     }
 
-    private void ListItems(RectTransform content, List<ItemPrefab> listItemPrefabs, List<Band> listBands, string currentListName)
+    private void ListItems(PropertiesHolder holder)
     {
         if (itemPrefab)
         {
-            foreach (Transform item in content)
+            foreach (Transform item in holder.PanelContent)
             {
                 Destroy(item.gameObject);
             }
 
-            listItemPrefabs.Clear();
+            holder.ItemPrefabs.Clear();
 
-            for (int index = 0; index < listBands.Count; index++)
+            for (int index = 0; index < holder.Bands.Count; index++)
             {
-                ItemPrefab item = Instantiate(itemPrefab, content.position, Quaternion.identity);
-                item.transform.SetParent(content);
+                ItemPrefab item = Instantiate(itemPrefab, holder.PanelContent.position, Quaternion.identity);
+                item.transform.SetParent(holder.PanelContent);
                 item.transform.localScale = Vector3.one;
-                item.Set(index, listBands[index], listBands.Count, currentListName);
-                listItemPrefabs.Add(item);
+                item.Set(index, holder.Bands[index], holder.Bands.Count, holder.Type);
+                holder.ItemPrefabs.Add(item);
             }
+
+            UpdateTitleAndButtons(holder);
         }
+    }
+
+    private void UpdateTitleAndButtons(PropertiesHolder holder)
+    {
+        string currentTitle = holder.PanelTitle.text;
+        int indexOf = currentTitle.IndexOf("-");
+        currentTitle = (indexOf != -1 ? currentTitle.Substring(0, indexOf).Trim() : currentTitle);
+        string counterText = (holder.ItemPrefabs.Count != 0 ? string.Format("{0} Item(s)", holder.ItemPrefabs.Count) : "Empty");
+        currentTitle = string.Format("{0} - {1}", currentTitle, counterText);
+        holder.PanelTitle.text = currentTitle;
     }
 }

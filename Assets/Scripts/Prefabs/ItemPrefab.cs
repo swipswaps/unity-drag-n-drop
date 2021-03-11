@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,86 +10,68 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     [Header("Children UI Elements")]
     [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private Button moveUpButton;
-    [SerializeField] private Button moveBottomButton;
     [SerializeField] private Button deleteButton;
-
-    // State
-
-    [SerializeField] private int currentIndex;
-    [SerializeField] private Vector2 initialPosition;
-    [SerializeField] private Transform initialParent;
-    [SerializeField] private string currentListName;
 
     // Cached References
 
-    private Band band;
     private RectTransform rectTransform;
-    private CanvasGroup canvasGroup;
+    [SerializeField] private List<Band> currentBandList;
+    [SerializeField] private List<ItemPrefab> currentPrefabList;
 
     // Properties
 
-    public int CurrentIndex { get => currentIndex; set => currentIndex = value; }
-    public Band Band { get => band; set => band = value; }
-    public string CurrentListName { get => currentListName; set => currentListName = value; }
-    public Transform InitialParent { get => initialParent; set => initialParent = value; }
-    public Vector2 InitialPosition { get => initialPosition; set => initialPosition = value; }
-    public CanvasGroup CanvasGroup { get => canvasGroup; private set => canvasGroup = value; }
+    public int CurrentIndex { get; private set; }
+    public Band Band { get; private set; }
+    public Transform InitialParent { get; set; }
+    public Vector2 InitialPosition { get; set; }
+    public CanvasGroup CanvasGroup { get; private set; }
+    public BandType Type { get; set; }
+
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         CanvasGroup = GetComponent<CanvasGroup>();
 
-        if (moveBottomButton && moveUpButton && deleteButton)
+        if (deleteButton)
         {
-            moveBottomButton.onClick.AddListener(() => MoveBottom(1));
-            moveUpButton.onClick.AddListener(() => MoveUp(1));
-            deleteButton.onClick.AddListener(Delete);
+            deleteButton.onClick.AddListener(() => Delete());
         }
     }
 
-    public void Set(int index, Band band, int bandsCount, string currentListName)
+    public void Set(int index, Band band, int bandsCount, BandType type)
     {
-        currentIndex = index;
+        CurrentIndex = index;
         Band = band;
-        CurrentListName = currentListName;
-
-        moveUpButton.gameObject.SetActive(index > 0);
-        moveBottomButton.gameObject.SetActive(index < (bandsCount - 1));
+        Type = type;
 
         if (descriptionText)
         {
-            string description = "{0} - {1}";
-            description = string.Format(description, (index + 1).ToString("00"), band.Name);
+            string description = "{0} - {1} - {2}";
+            description = string.Format(description, (index + 1).ToString("00"), band.Name, band.Year);
             descriptionText.text = description;
         }
     }
 
+    private void GetListReferences()
+    {
+        currentBandList = (Type == BandType.Current ? BandController.Instance.Bands : BandController.Instance.Favorites);
+        currentPrefabList = (Type == BandType.Current ? BandController.Instance.BandItemPrefabs : BandController.Instance.FavoriteItemPrefabs);
+    }
+
     public void MoveUp(int numberToDecrementIndex)
     {
-        bool isFavorite = currentListName.Equals("FavoriteItemPrefabs");
-        int listCount = (isFavorite ? BandController.Instance.Favorites.Count : BandController.Instance.Bands.Count);
-        int previousIndex = (currentIndex - numberToDecrementIndex);
+        GetListReferences();
 
+        int listCount = currentBandList.Count;
+        int previousIndex = (CurrentIndex - numberToDecrementIndex);
         if (previousIndex >= 0 && previousIndex <= listCount - 1)
         {
-            if (!isFavorite)
-            {
-                BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
-                BandController.Instance.BandItemPrefabs.Insert(previousIndex, this);
-                BandController.Instance.Bands.RemoveAt(currentIndex);
-                BandController.Instance.Bands.Insert(previousIndex, Band);
-            }
-            else
-            {
-                BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
-                BandController.Instance.FavoriteItemPrefabs.Insert(previousIndex, this);
-                BandController.Instance.Favorites.RemoveAt(currentIndex);
-                BandController.Instance.Favorites.Insert(previousIndex, Band);
-            }
-
-            currentIndex = previousIndex;
+            currentPrefabList.RemoveAt(CurrentIndex);
+            currentPrefabList.Insert(previousIndex, this);
+            currentBandList.RemoveAt(CurrentIndex);
+            currentBandList.Insert(previousIndex, Band);
+            CurrentIndex = previousIndex;
         }
 
         BandController.Instance.ListItems();
@@ -96,46 +79,27 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void MoveBottom(int numberToIncrementIndex)
     {
-        bool isFavorite = currentListName.Equals("FavoriteItemPrefabs");
-        int listCount = (isFavorite ? BandController.Instance.Favorites.Count : BandController.Instance.Bands.Count);
-        int nextIndex = (currentIndex + numberToIncrementIndex);
-
+        GetListReferences();
+        
+        int listCount = currentBandList.Count;
+        int nextIndex = (CurrentIndex + numberToIncrementIndex);
         if (nextIndex >= 0 && nextIndex <= listCount - 1)
         {
-            if (!isFavorite)
-            {
-                BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
-                BandController.Instance.BandItemPrefabs.Insert(nextIndex, this);
-                BandController.Instance.Bands.RemoveAt(currentIndex);
-                BandController.Instance.Bands.Insert(nextIndex, Band);
-            }
-            else
-            {
-                BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
-                BandController.Instance.FavoriteItemPrefabs.Insert(nextIndex, this);
-                BandController.Instance.Favorites.RemoveAt(currentIndex);
-                BandController.Instance.Favorites.Insert(nextIndex, Band);
-            }
-
-            currentIndex = nextIndex;
+            currentPrefabList.RemoveAt(CurrentIndex);
+            currentPrefabList.Insert(nextIndex, this);
+            currentBandList.RemoveAt(CurrentIndex);
+            currentBandList.Insert(nextIndex, Band);
+            CurrentIndex = nextIndex;
         }
-        
+
         BandController.Instance.ListItems();
     }
 
     private void Delete()
     {
-        if (currentListName.Equals("BandItemPrefabs"))
-        {
-            BandController.Instance.BandItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.Bands.RemoveAt(currentIndex);
-        }
-        else if (currentListName.Equals("FavoriteItemPrefabs"))
-        {
-            BandController.Instance.FavoriteItemPrefabs.RemoveAt(currentIndex);
-            BandController.Instance.Favorites.RemoveAt(currentIndex);
-        }
-
+        GetListReferences();
+        currentPrefabList.RemoveAt(CurrentIndex);
+        currentBandList.RemoveAt(CurrentIndex);
         Destroy(gameObject);
         BandController.Instance.ListItems();
     }
@@ -153,6 +117,11 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         }
     }
 
+    public void OnDrag(PointerEventData eventData)
+    {
+        rectTransform.anchoredPosition += (eventData.delta / BandController.Instance.Canvas.scaleFactor);
+    }
+
     public void OnEndDrag(PointerEventData eventData)
     {
         CanvasGroup.alpha = 1f;
@@ -161,12 +130,7 @@ public class ItemPrefab : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if (eventData.hovered.Count >= 1)
         {
             transform.SetParent(InitialParent);
-            transform.SetSiblingIndex(currentIndex);
+            transform.SetSiblingIndex(CurrentIndex);
         }
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        rectTransform.anchoredPosition += (eventData.delta / BandController.Instance.Canvas.scaleFactor);
     }
 }

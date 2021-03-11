@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 // || This is attached to the Viewport of ScrollView
@@ -39,20 +40,16 @@ public class DroppableContent : MonoBehaviour, IDropHandler
 
                 if (!itemPrefab.InitialParent.Equals(content))
                 {
-                    if (itemPrefab.CurrentListName.Equals("BandItemPrefabs"))
-                    {
-                        BandController.Instance.BandItemPrefabs.RemoveAt(itemPrefab.CurrentIndex);
-                        BandController.Instance.Bands.RemoveAt(itemPrefab.CurrentIndex);
-                        BandController.Instance.FavoriteItemPrefabs.Add(itemPrefab);
-                        BandController.Instance.Favorites.Add(itemPrefab.Band);
-                    }
-                    else if (itemPrefab.CurrentListName.Equals("FavoriteItemPrefabs"))
-                    {
-                        BandController.Instance.FavoriteItemPrefabs.RemoveAt(itemPrefab.CurrentIndex);
-                        BandController.Instance.Favorites.RemoveAt(itemPrefab.CurrentIndex);
-                        BandController.Instance.BandItemPrefabs.Add(itemPrefab);
-                        BandController.Instance.Bands.Add(itemPrefab.Band);
-                    }
+                    List<ItemPrefab> currentPrefabList = (itemPrefab.Type == BandType.Current ? BandController.Instance.BandItemPrefabs : BandController.Instance.FavoriteItemPrefabs);
+                    List<Band> currentBandList = (itemPrefab.Type == BandType.Current ? BandController.Instance.Bands : BandController.Instance.Favorites);
+                    List<ItemPrefab> otherPrefabList = (itemPrefab.Type == BandType.Current ? BandController.Instance.FavoriteItemPrefabs : BandController.Instance.BandItemPrefabs);
+                    List<Band> otherBandList = (itemPrefab.Type == BandType.Current ? BandController.Instance.Favorites : BandController.Instance.Bands);
+
+                    currentPrefabList.RemoveAt(itemPrefab.CurrentIndex);
+                    currentBandList.RemoveAt(itemPrefab.CurrentIndex);
+                    otherPrefabList.Add(itemPrefab);
+                    otherBandList.Add(itemPrefab.Band);
+                    BandController.Instance.ListItems();
                 }
                 else
                 {
@@ -70,12 +67,8 @@ public class DroppableContent : MonoBehaviour, IDropHandler
                         {
                             itemPrefab.MoveUp(numberToJump);
                         }
-
-                        return;
                     }
                 }
-
-                BandController.Instance.ListItems();
             }
         }
     }

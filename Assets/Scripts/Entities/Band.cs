@@ -1,16 +1,9 @@
-﻿using System;
-using UnityEngine;
-
-[Serializable]
+﻿
 public class Band
 {
-    private int id;
-    [SerializeField] private string name;
-    private int year;
-
-    public int Id { get => id; set => id = value; }
-    public string Name { get => name; set => name = value; }
-    public int Year { get => year; set => year = value; }
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public int Year { get; private set; }
 
     public Band(int id, string name, int year)
     {

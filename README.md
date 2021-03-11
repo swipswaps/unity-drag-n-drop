@@ -2,6 +2,11 @@
 
 Sample project for Drag 'n' Drop funcionality with lists in Unity.
 
+## Live test
+
+https://retrogemn.itch.io/drag-n-drop-unity-demo
+https://gamejolt.com/games/drag-n-drop-unity-demo/585508
+
 ## Running the project locally
 
 * Download `.zip` file or `git clone` this repo from `master` branch
